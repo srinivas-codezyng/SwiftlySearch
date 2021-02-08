@@ -39,6 +39,7 @@ struct SearchBar<ResultContent: View>: UIViewControllerRepresentable {
     let cancelClicked: () -> Void
     let searchClicked: () -> Void
     let resultContent: (String) -> ResultContent?
+//    private var searchBarWrapper:SearchBarWrapperController?
 
     init(text: Binding<String>, placeholder: String?, hidesNavigationBarDuringPresentation: Bool, hidesSearchBarWhenScrolling: Bool, cancelClicked: @escaping () -> Void, searchClicked: @escaping () -> Void, @ViewBuilder resultContent: @escaping (String) -> ResultContent? = { _ in nil }) {
         self._text = text
@@ -73,6 +74,7 @@ struct SearchBar<ResultContent: View>: UIViewControllerRepresentable {
     class Coordinator: NSObject, UISearchResultsUpdating, UISearchBarDelegate {
         @Binding
         var text: String
+        var localText:String = ""
         var cancelClicked: () -> Void
         var searchClicked: () -> Void
         let searchController: UISearchController
@@ -108,9 +110,10 @@ struct SearchBar<ResultContent: View>: UIViewControllerRepresentable {
         func updateSearchResults(for searchController: UISearchController) {
             guard let text = searchController.searchBar.text else { return }
             // Make sure the text has actually changed (workaround for #10).
-            guard text != self.text else { return }
+            guard text != localText else { return }
             DispatchQueue.main.async {
                 self.text = text
+                self.localText = text
             }
         }
 
